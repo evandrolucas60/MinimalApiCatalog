@@ -25,14 +25,29 @@ app.MapPost("/categorias", async(Category category, ApplicationDbContext db) =>
     return Results.Created($"/categorias/{category.CategoryId}", category);
 });
 
-
 app.MapGet("/categorias", async (ApplicationDbContext db) => await db.Categories.ToListAsync());
+
 app.MapGet("/categorias{id:int}", async (int id ,ApplicationDbContext db) =>
 {
     return await db.Categories.FindAsync(id)
             is Category category
             ?Results.Ok(category)
             : Results.NotFound();
+});
+
+app.MapPut("/categoria/{id:int}", async (int id, Category category, ApplicationDbContext db) =>
+{
+    if (category.CategoryId != id) return Results.BadRequest();
+
+    var categoryDb = await db.Categories.FindAsync(id);
+
+    if (categoryDb is null) return Results.NotFound();
+
+    categoryDb.Name = category.Name;
+    categoryDb.Description = category.Description;
+
+    await db.SaveChangesAsync();
+    return Results.Ok(categoryDb);
 });
 
 // Configure the HTTP request pipeline.
