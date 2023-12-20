@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MinimalApiCatalog.ApiEndpoints;
+using MinimalApiCatalog.AppServicesExtensions;
 using MinimalApiCatalog.Context;
 using MinimalApiCatalog.Services;
 using System.Text;
@@ -82,11 +83,11 @@ app.MapCategoriesEndpoints();
 app.MapProductsEndpoints();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+var environment = app.Environment;
+
+app.UseExceptionHandling(environment)
+    .UseSwaggerMiddleware()
+    .UseAppCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
